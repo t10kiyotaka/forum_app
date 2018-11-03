@@ -1,5 +1,6 @@
 class DiscussionsController < ApplicationController
-  before_action :set_discussion, only: [:show, :edit, :update, :destroy]
+  skip_before_action :authenticate_user!, only: [:index, :show]
+  before_action :set_owned_discussion, only: [:edit, :update, :destroy]
 
   # GET /discussions
   # GET /discussions.json
@@ -10,6 +11,7 @@ class DiscussionsController < ApplicationController
   # GET /discussions/1
   # GET /discussions/1.json
   def show
+    @discussion = Discussion.find(params[:id])
   end
 
   # GET /discussions/new
@@ -24,7 +26,7 @@ class DiscussionsController < ApplicationController
   # POST /discussions
   # POST /discussions.json
   def create
-    @discussion = Discussion.new(discussion_params)
+    @discussion = current_user.discussions.new(discussion_params)
 
     respond_to do |format|
       if @discussion.save
@@ -63,8 +65,19 @@ class DiscussionsController < ApplicationController
 
   private
     # Use callbacks to share common setup or constraints between actions.
-    def set_discussion
-      @discussion = Discussion.find(params[:id])
+    def set_owned_discussion
+      begin
+        @discussion = current_user.discussions.find(params[:id])
+      rescue ActiveRecord::RecordNotFound => e
+        logger.info "=========================="
+        if user_logged_in?
+          logger.info "#{current_user.name} is trying to edit discussion #{params[:id]}, but they don't own it."
+        end
+        logger.info e
+        logger.info "=========================="
+        flash[:notice] = "You don't have access to that."
+        redirect_to root_path
+      end
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

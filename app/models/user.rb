@@ -1,4 +1,5 @@
 class User < ApplicationRecord
+  has_many :discussions
 
   def self.create_or_update_from(auth_info)
     user = where(uid: auth_info[:uid], provider: auth_info[:provider]).first_or_create
@@ -14,4 +15,9 @@ class User < ApplicationRecord
     )
     user
   end
+
+  def owns_discussion?(discussion)
+    id == discussion.user_id
+  end
+
 end
