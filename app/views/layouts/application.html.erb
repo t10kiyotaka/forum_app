@@ -10,6 +10,25 @@
   </head>
 
   <body>
-    <%= yield %>
+    <nav>
+      <div class="nav-wrapper teal accent-3">
+        <div class="container">
+            <%= link_to "Forum", root_path, class: "brand-logo" %>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+              <% if user_logged_in? %>
+                <li><%= "Hello, #{current_user.name} !" %></li>
+                <li><%= link_to "Sign Out", sign_out_path %></li>
+                <li><%= image_tag(current_user.image_url, class: "responsive-img circle") %></li>
+              <% else %>
+                <li><a href="/auth/twitter">Sign in with Twitter</a></li>
+              <% end %>
+            </ul>
+          </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <%= yield %>
+    </div>
   </body>
 </html>

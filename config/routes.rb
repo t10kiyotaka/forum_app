@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  root to: 'discussions#index'
   resources :discussions
-  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+  get '/auth/:provider/callback' => 'sessions#new'
+  get '/auth/sign-out' => 'sessions#sign_out', as: :sign_out
+
 end
